@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Space Habitat Designer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+        }
+
+        #game-container {
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container"></div>
+
+    <!-- Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+
+    <!-- Game Script -->
+    <script>
+        // Add error handling for Phaser.js loading
+        window.addEventListener('error', function(e) {
+            console.error('Error loading game:', e);
+            document.getElementById('game-container').innerHTML =
+                '<div style="color: white; padding: 20px; text-align: center;">' +
+                '<h2>Error Loading Game</h2>' +
+                '<p>Please check the browser console for details.</p>' +
+                '<p>Make sure you are running this from a web server, not opening the file directly.</p>' +
+                '</div>';
+        });
+
+        // Check if Phaser is loaded
+        window.addEventListener('load', function() {
+            if (typeof Phaser === 'undefined') {
+                document.getElementById('game-container').innerHTML =
+                    '<div style="color: white; padding: 20px; text-align: center;">' +
+                    '<h2>Phaser.js Failed to Load</h2>' +
+                    '<p>Please check your internet connection and try refreshing the page.</p>' +
+                    '</div>';
+            }
+        });
+    </script>
+    <script src="main.js"></script>
+</body>
+
+</html>

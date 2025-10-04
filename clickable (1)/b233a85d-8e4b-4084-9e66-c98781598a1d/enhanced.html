@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Space Habitat Designer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+        }
+
+        #game-container {
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+        }
+
+        button {
+            background: #333;
+            color: white;
+            border: 1px solid #666;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #555;
+        }
+
+        button.active {
+            background: #00ff00;
+            color: black;
+        }
+
+        select {
+            background: #333;
+            color: white;
+            border: 1px solid #666;
+            padding: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <div>
+            <strong>🚀 Space Habitat Designer</strong>
+        </div>
+        <div>
+            <label>Shape: </label>
+            <button id="circleBtn" class="active">Circle</button>
+            <button id="rectangleBtn">Rectangle</button>
+        </div>
+        <div>
+            <label>Mission: </label>
+            <select id="missionSelect">
+                <option value="transit">🛰️ Transit Station</option>
+                <option value="moon">🌕 Moon Base</option>
+                <option value="mars">🔴 Mars Base</option>
+            </select>
+        </div>
+        <div>
+            <button id="resetBtn">🔄 Reset</button>
+        </div>
+    </div>
+
+    <div id="game-container"></div>
+
+    <!-- Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+
+    <script>
+        // Game variables
+        let modules = [];
+        let scoreText;
+        let metricsText;
+        let adviceText;
+        let habitatShape;
+        let habitatBoundary;
+        let crewCapacity = 0;
+        let currentMission = 'transit';
+
+        // Mission configurations
+        const MISSIONS = {
+            transit: {
+                name: 'Transit Station',
+                shape: 'circle',
+                size: 250,
+                color: 0x1a1a2e,
+                description: 'Microgravity environment - circular habitat optimal'
+            },
+            moon: {
+                name: 'Moon Base',
+                shape: 'rectangle',
+                width: 400,
+                height: 300,
+                color: 0x2a2a4e,
+                description: 'Surface gravity - rectangular base preferred'
+            },
+            mars: {
+                name: 'Mars Base',
+                shape: 'rectangle',
+                width: 500,
+                height: 350,
+                color: 0x3a2a2e,
+                description: 'Red planet surface - larger habitat needed'
+            }
+        };
+
+        // Module types with icons
+        const MODULE_TYPES = {
+            SLEEP_POD: {
+                name: 'Sleep Pod',
+                color: 0x00ff00,
+                crewSupport: 2,
+                size: 60,
+                icon: '💤'
+            },
+            KITCHEN: {
+                name: 'Kitchen',
+                color: 0xffff00,
+                crewSupport: 1,
+                size: 50,
+                icon: '🍽️'
+            },
+            EXERCISE: {
+                name: 'Exercise Area',
+                color: 0x0080ff,
+                crewSupport: 1,
+                size: 55,
+                icon: '💪'
+            },
+            STORAGE: {
+                name: 'Storage',
+                color: 0x8000ff,
+                crewSupport: 0,
+                size: 45,
+                icon: '📦'
+            },
+            HYGIENE: {
+                name: 'Hygiene',
+                color: 0xff0000,
+                crewSupport: 1,
+                size: 40,
+                icon: '🚿'
+            },
+            COMMAND: {
+                name: 'Command Center',
+                color: 0xff8000,
+                crewSupport: 1,
+                size: 50,
+                icon: '🎛️'
+            }
+        };
+
+        // Game configuration
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game-container',
+            backgroundColor: '#0a0a0a',
+            scene: {
+                create: function() {
+                    console.log('Creating game scene...');
+
+                    // Create starfield
+                    for (let i = 0; i < 100; i++) {
+                        const x = Phaser.Math.Between(0, 800);
+                        const y = Phaser.Math.Between(0, 600);
+                        this.add.circle(x, y, 1, 0xffffff, Phaser.Math.FloatBetween(0.3, 1));
+                    }
+
+                    // Create initial habitat
+                    createHabitat.call(this);
+
+                    // Create UI
+                    createUI.call(this);
+
+                    // Create module palette
+                    createModulePalette.call(this);
+
+                    // Setup controls
+                    setupControls.call(this);
+
+                    // Update initial score
+                    updateScore();
+
+                    console.log('Game scene created successfully');
+                }
+            }
+        };
+
+        function createHabitat() {
+            // Remove existing habitat
+            if (habitatBoundary) {
+                habitatBoundary.destroy();
+            }
+
+            const mission = MISSIONS[currentMission];
+
+            if (mission.shape === 'circle') {
+                habitatBoundary = this.add.circle(400, 300, mission.size, mission.color, 0.3);
+                habitatBoundary.setStrokeStyle(3, 0x4a4a6a);
+            } else {
+                habitatBoundary = this.add.rectangle(400, 300, mission.width, mission.height, mission.color, 0.3);
+                habitatBoundary.setStrokeStyle(3, 0x4a4a6a);
+            }
+
+            habitatShape = mission.shape;
+        }
+
+        function createUI() {
+            // Instructions panel
+            this.add.text(10, 10,
+                'SPACE HABITAT DESIGNER\n' +
+                'Click colored squares to add modules\n' +
+                'Drag modules to position them\n' +
+                'Green outline = Valid placement\n' +
+                'Red outline = Invalid (overlap/outside boundary)', {
+                    fontSize: '12px',
+                    fill: '#ffffff',
+                    backgroundColor: '#000000',
+                    padding: {
+                        x: 10,
+                        y: 5
+                    }
+                }
+            );
+
+            // Score panel
+            scoreText = this.add.text(10, 120, '', {
+                fontSize: '16px',
+                fill: '#00ff00',
+                backgroundColor: '#000000',
+                padding: {
+                    x: 10,
+                    y: 5
+                }
+            });
+
+            // Metrics panel
+            metricsText = this.add.text(10, 200, '', {
+                fontSize: '14px',
+                fill: '#ffff00',
+                backgroundColor: '#000000',
+                padding: {
+                    x: 10,
+                    y: 5
+                }
+            });
+
+            // Design Advice panel
+            adviceText = this.add.text(10, 300, '', {
+                fontSize: '12px',
+                fill: '#ff8000',
+                backgroundColor: '#000000',
+                padding: {
+                    x: 10,
+                    y: 5
+                },
+                wordWrap: {
+                    width: 300
+                }
+            });
+
+            // Team credit at bottom
+            this.add.text(400, 580, 'Created by Team Bomb Squad', {
+                fontSize: '14px',
+                fill: '#ffffff',
+                backgroundColor: '#000000',
+                padding: {
+                    x: 10,
+                    y: 5
+                }
+            }).setOrigin(0.5);
+        }
+
+        function createModulePalette() {
+            const startX = 650;
+            const startY = 50;
+            const spacing = 70;
+
+            let index = 0;
+            for (const [key, moduleType] of Object.entries(MODULE_TYPES)) {
+                const x = startX;
+                const y = startY + (index * spacing);
+
+                const module = this.add.rectangle(x, y, moduleType.size, moduleType.size, moduleType.color);
+                module.setStrokeStyle(2, 0xffffff);
+                module.setInteractive();
+                module.moduleType = key;
+                module.moduleData = moduleType;
+                module.isPalette = true;
+
+                // Add click event to palette modules
+                module.on('pointerdown', function() {
+                    console.log('Clicked palette module:', this.moduleType);
+                    createModule.call(this.scene, this.moduleData);
+                });
+
+                // Add module label with icon
+                this.add.text(x, y + 35, `${moduleType.icon} ${moduleType.name}`, {
+                    fontSize: '10px',
+                    fill: '#ffffff',
+                    align: 'center'
+                }).setOrigin(0.5);
+
+                modules.push(module);
+                index++;
+            }
+        }
+
+        function setupControls() {
+            // Shape buttons
+            document.getElementById('circleBtn').onclick = () => {
+                currentMission = 'transit';
+                MISSIONS[currentMission].shape = 'circle';
+                createHabitat.call(this);
+                updateScore();
+                document.getElementById('circleBtn').classList.add('active');
+                document.getElementById('rectangleBtn').classList.remove('active');
+            };
+
+            document.getElementById('rectangleBtn').onclick = () => {
+                currentMission = 'moon';
+                MISSIONS[currentMission].shape = 'rectangle';
+                createHabitat.call(this);
+                updateScore();
+                document.getElementById('rectangleBtn').classList.add('active');
+                document.getElementById('circleBtn').classList.remove('active');
+            };
+
+            // Mission selector
+            document.getElementById('missionSelect').onchange = (e) => {
+                currentMission = e.target.value;
+                createHabitat.call(this);
+                updateScore();
+            };
+
+            // Reset button
+            document.getElementById('resetBtn').onclick = () => {
+                // Remove all placed modules
+                modules.forEach(module => {
+                    if (!module.isPalette) {
+                        module.destroy();
+                    }
+                });
+                modules = modules.filter(module => module.isPalette);
+                updateScore();
+            };
+        }
+
+        function createModule(moduleData) {
+            console.log('Creating module:', moduleData.name);
+
+            // Create a new module at the center of the habitat
+            const newModule = this.add.rectangle(400, 300, moduleData.size, moduleData.size, moduleData.color);
+            newModule.setStrokeStyle(2, 0xffffff);
+            newModule.setInteractive();
+            newModule.moduleType = moduleData.name;
+            newModule.moduleData = moduleData;
+            newModule.isPalette = false;
+
+            // Make it draggable
+            this.input.setDraggable(newModule);
+
+            // Add drag events
+            newModule.on('dragstart', function(pointer, dragX, dragY) {
+                console.log('Drag start');
+            });
+
+            newModule.on('drag', function(pointer, dragX, dragY) {
+                this.x = dragX;
+                this.y = dragY;
+                updateModuleValidity(this);
+            });
+
+            newModule.on('dragend', function(pointer, dragX, dragY) {
+                console.log('Drag end');
+                updateScore();
+            });
+
+            modules.push(newModule);
+            updateModuleValidity(newModule);
+            updateScore();
+        }
+
+        function updateModuleValidity(module) {
+            if (module.isPalette) return;
+
+            const isValid = isModulePlacementValid(module);
+            const outlineColor = isValid ? 0x00ff00 : 0xff0000;
+            module.setStrokeStyle(3, outlineColor);
+
+            // Add glow effect for valid placement
+            if (isValid) {
+                module.setStrokeStyle(3, 0x00ff00, 0.8);
+            }
+        }
+
+        function isModulePlacementValid(module) {
+            const mission = MISSIONS[currentMission];
+
+            if (mission.shape === 'circle') {
+                // Check if module is within circular habitat boundary
+                const distanceFromCenter = Phaser.Math.Distance.Between(400, 300, module.x, module.y);
+                const radius = module.moduleData.size / 2;
+                if (distanceFromCenter + radius > mission.size) {
+                    return false;
+                }
+            } else {
+                // Check if module is within rectangular habitat boundary
+                const halfWidth = mission.width / 2;
+                const halfHeight = mission.height / 2;
+                const moduleRadius = module.moduleData.size / 2;
+
+                if (module.x - moduleRadius < 400 - halfWidth ||
+                    module.x + moduleRadius > 400 + halfWidth ||
+                    module.y - moduleRadius < 300 - halfHeight ||
+                    module.y + moduleRadius > 300 + halfHeight) {
+                    return false;
+                }
+            }
+
+            // Check for overlaps with other modules
+            for (const otherModule of modules) {
+                if (otherModule === module || otherModule.isPalette) continue;
+
+                const distance = Phaser.Math.Distance.Between(module.x, module.y, otherModule.x, otherModule.y);
+                const minDistance = (module.moduleData.size + otherModule.moduleData.size) / 2;
+
+                if (distance < minDistance) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function updateScore() {
+            crewCapacity = 0;
+            let validModules = 0;
+            let totalModuleArea = 0;
+            let usedArea = 0;
+
+            for (const module of modules) {
+                if (!module.isPalette) {
+                    const moduleArea = Math.PI * Math.pow(module.moduleData.size / 2, 2);
+                    totalModuleArea += moduleArea;
+
+                    if (isModulePlacementValid(module)) {
+                        crewCapacity += module.moduleData.crewSupport;
+                        validModules++;
+                        usedArea += moduleArea;
+                    }
+                }
+            }
+
+            // Calculate habitat area
+            const mission = MISSIONS[currentMission];
+            let habitatArea;
+            if (mission.shape === 'circle') {
+                habitatArea = Math.PI * Math.pow(mission.size, 2);
+            } else {
+                habitatArea = mission.width * mission.height;
+            }
+
+            const areaUsedPercent = (usedArea / habitatArea * 100).toFixed(1);
+            const crewEfficiency = validModules > 0 ? (crewCapacity / validModules).toFixed(1) : 0;
+
+            scoreText.setText(`CREW SUPPORTED: ${crewCapacity}\nVALID MODULES: ${validModules}`);
+            metricsText.setText(`AREA USED: ${areaUsedPercent}%\nCREW EFFICIENCY: ${crewEfficiency}\nMISSION: ${mission.name}`);
+
+            // Update design advice
+            updateAdvice();
+
+            console.log('Score updated:', crewCapacity, validModules);
+        }
+
+        function updateAdvice() {
+            let advice = '';
+            const mission = MISSIONS[currentMission];
+
+            // Mission-specific advice
+            advice += `${mission.description}\n\n`;
+
+            // Check for specific module placements
+            const validModules = modules.filter(m => !m.isPalette && isModulePlacementValid(m));
+
+            if (validModules.length === 0) {
+                advice += '💡 Start by placing essential modules: Sleep Pods and Command Center';
+            } else if (crewCapacity >= 6) {
+                advice += '🎉 Excellent habitat design! Maximum crew capacity reached!';
+            } else {
+                // Check for optimal placements
+                const sleepPods = validModules.filter(m => m.moduleType === 'Sleep Pod');
+                const commandCenters = validModules.filter(m => m.moduleType === 'Command Center');
+
+                if (sleepPods.length === 0) {
+                    advice += '⚠️ Add Sleep Pods for crew rest - essential for mission success!\n';
+                }
+                if (commandCenters.length === 0) {
+                    advice += '⚠️ Place Command Center for mission control and communication!\n';
+                }
+
+                // Check for hygiene near kitchen
+                const hygieneModules = validModules.filter(m => m.moduleType === 'Hygiene');
+                const kitchenModules = validModules.filter(m => m.moduleType === 'Kitchen');
+
+                for (const hygiene of hygieneModules) {
+                    for (const kitchen of kitchenModules) {
+                        const distance = Phaser.Math.Distance.Between(hygiene.x, hygiene.y, kitchen.x, kitchen.y);
+                        if (distance < 100) {
+                            advice += '⚠️ Consider placing hygiene away from kitchen for safety!\n';
+                            break;
+                        }
+                    }
+                }
+
+                advice += '💡 Try adding more modules to increase crew capacity!';
+            }
+
+            adviceText.setText(advice);
+        }
+
+        // Initialize the game
+        console.log('Initializing game...');
+        try {
+            const game = new Phaser.Game(config);
+            console.log('Game initialized successfully');
+        } catch (error) {
+            console.error('Game initialization failed:', error);
+        }
+    </script>
+</body>
+
+</html>

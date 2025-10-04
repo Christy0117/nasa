@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Space Habitat Designer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+        }
+
+        #game-container {
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container"></div>
+
+    <!-- Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+
+    <script>
+        // Game variables
+        let modules = [];
+        let scoreText;
+        let instructionsText;
+        let crewCapacity = 0;
+
+        // Module types
+        const MODULE_TYPES = {
+            SLEEP_POD: {
+                name: 'Sleep Pod',
+                color: 0x00ff00,
+                crewSupport: 2,
+                size: 60
+            },
+            KITCHEN: {
+                name: 'Kitchen',
+                color: 0xffff00,
+                crewSupport: 1,
+                size: 50
+            },
+            EXERCISE: {
+                name: 'Exercise Area',
+                color: 0x0080ff,
+                crewSupport: 1,
+                size: 55
+            },
+            STORAGE: {
+                name: 'Storage',
+                color: 0x8000ff,
+                crewSupport: 0,
+                size: 45
+            },
+            HYGIENE: {
+                name: 'Hygiene',
+                color: 0xff0000,
+                crewSupport: 1,
+                size: 40
+            },
+            COMMAND: {
+                name: 'Command Center',
+                color: 0xff8000,
+                crewSupport: 1,
+                size: 50
+            }
+        };
+
+        // Game configuration
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game-container',
+            backgroundColor: '#0a0a0a',
+            scene: {
+                create: function() {
+                    console.log('Creating game scene...');
+
+                    // Create starfield
+                    for (let i = 0; i < 100; i++) {
+                        const x = Phaser.Math.Between(0, 800);
+                        const y = Phaser.Math.Between(0, 600);
+                        this.add.circle(x, y, 1, 0xffffff, Phaser.Math.FloatBetween(0.3, 1));
+                    }
+
+                    // Create habitat boundary
+                    const habitat = this.add.circle(400, 300, 250, 0x1a1a2e, 0.3);
+                    habitat.setStrokeStyle(3, 0x4a4a6a);
+
+                    // Create UI
+                    instructionsText = this.add.text(10, 10,
+                        'SPACE HABITAT DESIGNER\n' +
+                        'Click on colored squares to add modules\n' +
+                        'Modules appear in center - drag to position\n' +
+                        'Green outline = Valid placement\n' +
+                        'Red outline = Invalid (overlap/outside boundary)', {
+                            fontSize: '14px',
+                            fill: '#ffffff',
+                            backgroundColor: '#000000',
+                            padding: {
+                                x: 10,
+                                y: 5
+                            }
+                        }
+                    );
+
+                    scoreText = this.add.text(10, 150, '', {
+                        fontSize: '18px',
+                        fill: '#00ff00',
+                        backgroundColor: '#000000',
+                        padding: {
+                            x: 10,
+                            y: 5
+                        }
+                    });
+
+                    // Create module palette
+                    const startX = 650;
+                    const startY = 50;
+                    const spacing = 70;
+
+                    let index = 0;
+                    for (const [key, moduleType] of Object.entries(MODULE_TYPES)) {
+                        const x = startX;
+                        const y = startY + (index * spacing);
+
+                        const module = this.add.rectangle(x, y, moduleType.size, moduleType.size, moduleType.color);
+                        module.setStrokeStyle(2, 0xffffff);
+                        module.setInteractive();
+                        module.moduleType = key;
+                        module.moduleData = moduleType;
+                        module.isPalette = true;
+
+                        // Add click event to palette modules
+                        module.on('pointerdown', function() {
+                            console.log('Clicked palette module:', this.moduleType);
+                            createModule.call(this.scene, this.moduleData);
+                        });
+
+                        this.add.text(x, y + 35, moduleType.name, {
+                            fontSize: '10px',
+                            fill: '#ffffff',
+                            align: 'center'
+                        }).setOrigin(0.5);
+
+                        modules.push(module);
+                        index++;
+                    }
+
+                    // Update initial score
+                    updateScore();
+
+                    console.log('Game scene created successfully');
+                }
+            }
+        };
+
+        function createModule(moduleData) {
+            console.log('Creating module:', moduleData.name);
+
+            // Create a new module at the center of the habitat
+            const newModule = this.add.rectangle(400, 300, moduleData.size, moduleData.size, moduleData.color);
+            newModule.setStrokeStyle(2, 0xffffff);
+            newModule.setInteractive();
+            newModule.moduleType = moduleData.name;
+            newModule.moduleData = moduleData;
+            newModule.isPalette = false;
+
+            // Make it draggable
+            this.input.setDraggable(newModule);
+
+            // Add drag events
+            newModule.on('dragstart', function(pointer, dragX, dragY) {
+                console.log('Drag start');
+            });
+
+            newModule.on('drag', function(pointer, dragX, dragY) {
+                this.x = dragX;
+                this.y = dragY;
+                updateModuleValidity(this);
+            });
+
+            newModule.on('dragend', function(pointer, dragX, dragY) {
+                console.log('Drag end');
+                updateScore();
+            });
+
+            modules.push(newModule);
+            updateModuleValidity(newModule);
+            updateScore();
+        }
+
+        function updateModuleValidity(module) {
+            if (module.isPalette) return;
+
+            const isValid = isModulePlacementValid(module);
+            const outlineColor = isValid ? 0x00ff00 : 0xff0000;
+            module.setStrokeStyle(3, outlineColor);
+            console.log('Module validity:', isValid, 'at', module.x, module.y);
+        }
+
+        function isModulePlacementValid(module) {
+            // Check if module is within habitat boundary
+            const distanceFromCenter = Phaser.Math.Distance.Between(400, 300, module.x, module.y);
+            const radius = module.moduleData.size / 2;
+
+            if (distanceFromCenter + radius > 250) {
+                return false;
+            }
+
+            // Check for overlaps with other modules
+            for (const otherModule of modules) {
+                if (otherModule === module || otherModule.isPalette) continue;
+
+                const distance = Phaser.Math.Distance.Between(module.x, module.y, otherModule.x, otherModule.y);
+                const minDistance = (module.moduleData.size + otherModule.moduleData.size) / 2;
+
+                if (distance < minDistance) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function updateScore() {
+            crewCapacity = 0;
+            let validModules = 0;
+
+            for (const module of modules) {
+                if (!module.isPalette && isModulePlacementValid(module)) {
+                    crewCapacity += module.moduleData.crewSupport;
+                    validModules++;
+                }
+            }
+
+            scoreText.setText(`CREW SUPPORTED: ${crewCapacity}\nVALID MODULES: ${validModules}`);
+            console.log('Score updated:', crewCapacity, validModules);
+        }
+
+        // Initialize the game
+        console.log('Initializing game...');
+        try {
+            const game = new Phaser.Game(config);
+            console.log('Game initialized successfully');
+        } catch (error) {
+            console.error('Game initialization failed:', error);
+        }
+    </script>
+</body>
+
+</html>
