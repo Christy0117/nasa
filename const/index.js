@@ -4,6 +4,10 @@
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
 
-/**
- * @namespace Phaser.Types.Tilemaps
- */
+var CONST = {
+
+    ORIENTATION: require('./ORIENTATION_CONST')
+
+};
+
+module.exports = CONST;
