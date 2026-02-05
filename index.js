@@ -8,24 +8,26 @@ var CONST = require('./const');
 var Extend = require('../utils/object/Extend');
 
 /**
- * @namespace Phaser.Geom
+ * @namespace Phaser.Input
  */
 
-var Geom = {
+var Input = {
 
-    Circle: require('./circle'),
-    Ellipse: require('./ellipse'),
-    Intersects: require('./intersects'),
-    Line: require('./line'),
-    Mesh: require('./mesh'),
-    Point: require('./point'),
-    Polygon: require('./polygon'),
-    Rectangle: require('./rectangle'),
-    Triangle: require('./triangle')
+    CreatePixelPerfectHandler: require('./CreatePixelPerfectHandler'),
+    CreateInteractiveObject: require('./CreateInteractiveObject'),
+    Events: require('./events'),
+    Gamepad: require('./gamepad'),
+    InputManager: require('./InputManager'),
+    InputPlugin: require('./InputPlugin'),
+    InputPluginCache: require('./InputPluginCache'),
+    Keyboard: require('./keyboard'),
+    Mouse: require('./mouse'),
+    Pointer: require('./Pointer'),
+    Touch: require('./touch')
 
 };
 
 //   Merge in the consts
-Geom = Extend(false, Geom, CONST);
+Input = Extend(false, Input, CONST);
 
-module.exports = Geom;
+module.exports = Input;
