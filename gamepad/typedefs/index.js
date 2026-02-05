@@ -5,5 +5,5 @@
  */
 
 /**
- * @namespace Phaser.Types.Geom
+ * @namespace Phaser.Types.Input.Gamepad
  */
