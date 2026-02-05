@@ -5,5 +5,12 @@
  */
 
 /**
- * @namespace Phaser.Types.Animations
+ * @namespace Phaser.Cache.Events
  */
+
+module.exports = {
+
+    ADD: require('./ADD_EVENT'),
+    REMOVE: require('./REMOVE_EVENT')
+
+};
