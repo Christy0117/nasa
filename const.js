@@ -4,87 +4,71 @@
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
 
-var MATH_CONST = {
+var WEBGL_CONST = {
 
     /**
-     * The value of PI * 2.
+     * 	8-bit twos complement signed integer.
      *
-     * @name Phaser.Math.PI2
-     * @type {number}
-     * @since 3.0.0
+     * @name Phaser.Renderer.WebGL.BYTE
+     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
+     * @since 3.50.0
      */
-    PI2: Math.PI * 2,
+    BYTE: { enum: 0x1400, size: 1 },
 
     /**
-     * The value of PI * 0.5.
+     * 8-bit twos complement unsigned integer.
      *
-     * Yes, we understand that this should actually be PI * 2, but
-     * it has been like this for so long we can't change it now.
-     * If you need PI * 2, use the PI2 constant instead.
-     *
-     * @name Phaser.Math.TAU
-     * @type {number}
-     * @since 3.0.0
+     * @name Phaser.Renderer.WebGL.UNSIGNED_BYTE
+     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
+     * @since 3.50.0
      */
-    TAU: Math.PI * 0.5,
+    UNSIGNED_BYTE: { enum: 0x1401, size: 1 },
 
     /**
-     * An epsilon value (1.0e-6)
+     * 16-bit twos complement signed integer.
      *
-     * @name Phaser.Math.EPSILON
-     * @type {number}
-     * @since 3.0.0
+     * @name Phaser.Renderer.WebGL.SHORT
+     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
+     * @since 3.50.0
      */
-    EPSILON: 1.0e-6,
+    SHORT: { enum: 0x1402, size: 2 },
 
     /**
-     * For converting degrees to radians (PI / 180)
+     * 16-bit twos complement unsigned integer.
      *
-     * @name Phaser.Math.DEG_TO_RAD
-     * @type {number}
-     * @since 3.0.0
+     * @name Phaser.Renderer.WebGL.UNSIGNED_SHORT
+     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
+     * @since 3.50.0
      */
-    DEG_TO_RAD: Math.PI / 180,
+    UNSIGNED_SHORT: { enum: 0x1403, size: 2 },
 
     /**
-     * For converting radians to degrees (180 / PI)
+     * 32-bit twos complement signed integer.
      *
-     * @name Phaser.Math.RAD_TO_DEG
-     * @type {number}
-     * @since 3.0.0
+     * @name Phaser.Renderer.WebGL.INT
+     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
+     * @since 3.50.0
      */
-    RAD_TO_DEG: 180 / Math.PI,
+    INT: { enum: 0x1404, size: 4 },
 
     /**
-     * An instance of the Random Number Generator.
-     * This is not set until the Game boots.
+     * 32-bit twos complement unsigned integer.
      *
-     * @name Phaser.Math.RND
-     * @type {Phaser.Math.RandomDataGenerator}
-     * @since 3.0.0
+     * @name Phaser.Renderer.WebGL.UNSIGNED_INT
+     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
+     * @since 3.50.0
      */
-    RND: null,
+    UNSIGNED_INT: { enum: 0x1405, size: 4 },
 
     /**
-     * The minimum safe integer this browser supports.
-     * We use a const for backward compatibility with Internet Explorer.
+     * 32-bit IEEE floating point number.
      *
-     * @name Phaser.Math.MIN_SAFE_INTEGER
-     * @type {number}
-     * @since 3.21.0
+     * @name Phaser.Renderer.WebGL.FLOAT
+     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
+     * @since 3.50.0
      */
-    MIN_SAFE_INTEGER: Number.MIN_SAFE_INTEGER || -9007199254740991,
-
-    /**
-     * The maximum safe integer this browser supports.
-     * We use a const for backward compatibility with Internet Explorer.
-     *
-     * @name Phaser.Math.MAX_SAFE_INTEGER
-     * @type {number}
-     * @since 3.21.0
-     */
-    MAX_SAFE_INTEGER: Number.MAX_SAFE_INTEGER || 9007199254740991
+    FLOAT: { enum: 0x1406, size: 4 }
 
 };
 
-module.exports = MATH_CONST;
+module.exports = WEBGL_CONST;

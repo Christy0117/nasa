@@ -5,5 +5,5 @@
  */
 
 /**
- * @namespace Phaser.Types.Renderer.WebGL
+ * @namespace Phaser.Types.Scenes
  */
