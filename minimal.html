@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Minimal Test</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game {
+            border: 2px solid #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Minimal Phaser Test</h1>
+    <div id="game"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    <script>
+        const game = new Phaser.Game({
+            type: Phaser.AUTO,
+            width: 400,
+            height: 300,
+            parent: 'game',
+            backgroundColor: '#001122',
+            scene: {
+                create: function() {
+                    // Add a simple circle
+                    this.add.circle(200, 150, 50, 0x00ff00);
+                    // Add text
+                    this.add.text(200, 150, 'WORKING!', {
+                        fontSize: '20px',
+                        fill: '#ffffff'
+                    }).setOrigin(0.5);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

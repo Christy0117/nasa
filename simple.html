@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Space Game Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        #game-container {
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Simple Space Game Test</h1>
+    <p>This is a simplified version to test if the game works.</p>
+
+    <div id="game-container"></div>
+
+    <!-- Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+
+    <script>
+        console.log('Script starting...');
+
+        // Simple game configuration
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game-container',
+            backgroundColor: '#0a0a0a',
+            scene: {
+                create: function() {
+                    console.log('Scene create function called');
+
+                    // Add some stars
+                    for (let i = 0; i < 50; i++) {
+                        const x = Phaser.Math.Between(0, 800);
+                        const y = Phaser.Math.Between(0, 600);
+                        this.add.circle(x, y, 1, 0xffffff, 0.8);
+                    }
+
+                    // Add habitat boundary
+                    const habitat = this.add.circle(400, 300, 200, 0x1a1a2e, 0.3);
+                    habitat.setStrokeStyle(3, 0x4a4a6a);
+
+                    // Add title
+                    this.add.text(400, 50, 'SPACE HABITAT DESIGNER', {
+                        fontSize: '24px',
+                        fill: '#ffffff'
+                    }).setOrigin(0.5);
+
+                    // Add some modules
+                    const modules = [{
+                            x: 650,
+                            y: 100,
+                            color: 0x00ff00,
+                            name: 'Sleep Pod'
+                        },
+                        {
+                            x: 650,
+                            y: 150,
+                            color: 0xffff00,
+                            name: 'Kitchen'
+                        },
+                        {
+                            x: 650,
+                            y: 200,
+                            color: 0x0080ff,
+                            name: 'Exercise'
+                        },
+                        {
+                            x: 650,
+                            y: 250,
+                            color: 0x8000ff,
+                            name: 'Storage'
+                        },
+                        {
+                            x: 650,
+                            y: 300,
+                            color: 0xff0000,
+                            name: 'Hygiene'
+                        },
+                        {
+                            x: 650,
+                            y: 350,
+                            color: 0xff8000,
+                            name: 'Command'
+                        }
+                    ];
+
+                    modules.forEach(module => {
+                        const rect = this.add.rectangle(module.x, module.y, 50, 50, module.color);
+                        rect.setStrokeStyle(2, 0xffffff);
+                        rect.setInteractive();
+
+                        this.add.text(module.x, module.y + 35, module.name, {
+                            fontSize: '10px',
+                            fill: '#ffffff',
+                            align: 'center'
+                        }).setOrigin(0.5);
+                    });
+
+                    // Add instructions
+                    this.add.text(50, 100, 'Drag modules into the habitat circle!', {
+                        fontSize: '16px',
+                        fill: '#ffff00',
+                        backgroundColor: '#000000',
+                        padding: {
+                            x: 10,
+                            y: 5
+                        }
+                    });
+
+                    console.log('Scene created successfully');
+                }
+            }
+        };
+
+        // Initialize the game
+        console.log('Initializing game...');
+        try {
+            const game = new Phaser.Game(config);
+            console.log('Game initialized successfully');
+        } catch (error) {
+            console.error('Game initialization failed:', error);
+            document.getElementById('game-container').innerHTML =
+                '<div style="color: white; padding: 20px; text-align: center;">' +
+                '<h2>Game Failed to Load</h2>' +
+                '<p>Error: ' + error.message + '</p>' +
+                '</div>';
+        }
+    </script>
+</body>
+
+</html>

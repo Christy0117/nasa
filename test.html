@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        #test-container {
+            border: 2px solid #333;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Space Habitat Game Test</h1>
+
+    <div id="test-container">
+        <h2>Loading Status:</h2>
+        <p id="phaser-status">Checking Phaser.js...</p>
+        <p id="game-status">Checking game initialization...</p>
+    </div>
+
+    <!-- Phaser.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+
+    <script>
+        // Test Phaser loading
+        window.addEventListener('load', function() {
+            const phaserStatus = document.getElementById('phaser-status');
+            const gameStatus = document.getElementById('game-status');
+
+            if (typeof Phaser !== 'undefined') {
+                phaserStatus.innerHTML = '✅ Phaser.js loaded successfully! Version: ' + Phaser.VERSION;
+
+                // Test basic Phaser functionality
+                try {
+                    const config = {
+                        type: Phaser.AUTO,
+                        width: 400,
+                        height: 300,
+                        parent: 'test-container',
+                        backgroundColor: '#0a0a0a',
+                        scene: {
+                            create: function() {
+                                this.add.text(200, 150, 'Phaser Test', {
+                                    fontSize: '24px',
+                                    fill: '#ffffff'
+                                }).setOrigin(0.5);
+
+                                this.add.circle(200, 100, 30, 0x00ff00);
+
+                                gameStatus.innerHTML = '✅ Game scene created successfully!';
+                            }
+                        }
+                    };
+
+                    const testGame = new Phaser.Game(config);
+
+                } catch (error) {
+                    gameStatus.innerHTML = '❌ Game creation failed: ' + error.message;
+                    console.error('Game creation error:', error);
+                }
+
+            } else {
+                phaserStatus.innerHTML = '❌ Phaser.js failed to load!';
+                gameStatus.innerHTML = '❌ Cannot test game without Phaser.js';
+            }
+        });
+
+        // Error handling
+        window.addEventListener('error', function(e) {
+            console.error('Page error:', e);
+            document.getElementById('game-status').innerHTML = '❌ Page error: ' + e.message;
+        });
+    </script>
+</body>
+
+</html>
