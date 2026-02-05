@@ -5,16 +5,26 @@
  */
 
 /**
- * @namespace Phaser.Physics
+ * @namespace Phaser.Renderer
  */
 
 /**
- * @namespace Phaser.Types.Physics
+ * @namespace Phaser.Types.Renderer
  */
 
 module.exports = {
 
-    Arcade: require('./arcade'),
-    Matter: require('./matter-js')
+    Events: require('./events'),
+    Snapshot: require('./snapshot')
 
 };
+
+if (typeof CANVAS_RENDERER)
+{
+    module.exports.Canvas = require('./canvas');
+}
+
+if (typeof WEBGL_RENDERER)
+{
+    module.exports.WebGL = require('./webgl');
+}
