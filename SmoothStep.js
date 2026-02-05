@@ -4,58 +4,38 @@
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
 
-var MathSmoothStep = require('../math/SmoothStep');
-
 /**
- * Smoothstep is a sigmoid-like interpolation and clamping function.
+ * Calculate a smooth interpolation percentage of `x` between `min` and `max`.
  *
- * The function depends on three parameters, the input x, the "left edge"
- * and the "right edge", with the left edge being assumed smaller than the right edge.
+ * The function receives the number `x` as an argument and returns 0 if `x` is less than or equal to the left edge,
+ * 1 if `x` is greater than or equal to the right edge, and smoothly interpolates, using a Hermite polynomial,
+ * between 0 and 1 otherwise.
  *
- * The function receives a real number x as an argument and returns 0 if x is less than
- * or equal to the left edge, 1 if x is greater than or equal to the right edge, and smoothly
- * interpolates, using a Hermite polynomial, between 0 and 1 otherwise. The slope of the
- * smoothstep function is zero at both edges.
- *
- * This is convenient for creating a sequence of transitions using smoothstep to interpolate
- * each segment as an alternative to using more sophisticated or expensive interpolation techniques.
- *
- * @function Phaser.Actions.SmoothStep
+ * @function Phaser.Math.SmoothStep
  * @since 3.0.0
+ * @see {@link https://en.wikipedia.org/wiki/Smoothstep}
  *
- * @generic {Phaser.GameObjects.GameObject[]} G - [items,$return]
+ * @param {number} x - The input value.
+ * @param {number} min - The minimum value, also known as the 'left edge', assumed smaller than the 'right edge'.
+ * @param {number} max - The maximum value, also known as the 'right edge', assumed greater than the 'left edge'.
  *
- * @param {(array|Phaser.GameObjects.GameObject[])} items - An array of Game Objects. The contents of this array are updated by this Action.
- * @param {string} property - The property of the Game Object to interpolate.
- * @param {number} min - The minimum interpolation value.
- * @param {number} max - The maximum interpolation value.
- * @param {boolean} [inc=false] - Should the property value be incremented (`true`) or set (`false`)?
- *
- * @return {(array|Phaser.GameObjects.GameObject[])} The array of Game Objects that was passed to this Action.
+ * @return {number} The percentage of interpolation, between 0 and 1.
  */
-var SmoothStep = function (items, property, min, max, inc)
+var SmoothStep = function (x, min, max)
 {
-    if (inc === undefined) { inc = false; }
-
-    var step = Math.abs(max - min) / items.length;
-    var i;
-
-    if (inc)
+    if (x <= min)
     {
-        for (i = 0; i < items.length; i++)
-        {
-            items[i][property] += MathSmoothStep(i * step, min, max);
-        }
-    }
-    else
-    {
-        for (i = 0; i < items.length; i++)
-        {
-            items[i][property] = MathSmoothStep(i * step, min, max);
-        }
+        return 0;
     }
 
-    return items;
+    if (x >= max)
+    {
+        return 1;
+    }
+
+    x = (x - min) / (max - min);
+
+    return x * x * (3 - 2 * x);
 };
 
 module.exports = SmoothStep;

@@ -4,32 +4,26 @@
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
 
-var PropertyValueInc = require('./PropertyValueInc');
-
 /**
- * Takes an array of Game Objects, or any objects that have a public `rotation` property,
- * and then adds the given value to each of their `rotation` properties.
+ * Rotate a given point by a given angle around the origin (0, 0), in an anti-clockwise direction.
  *
- * The optional `step` property is applied incrementally, multiplied by each item in the array.
- *
- * To use this with a Group: `Rotate(group.getChildren(), value, step)`
- *
- * @function Phaser.Actions.Rotate
+ * @function Phaser.Math.Rotate
  * @since 3.0.0
  *
- * @generic {Phaser.GameObjects.GameObject[]} G - [items,$return]
+ * @param {(Phaser.Geom.Point|object)} point - The point to be rotated.
+ * @param {number} angle - The angle to be rotated by in an anticlockwise direction.
  *
- * @param {(array|Phaser.GameObjects.GameObject[])} items - The array of items to be updated by this action.
- * @param {number} value - The amount to be added to the `rotation` property (in radians).
- * @param {number} [step=0] - This is added to the `value` amount, multiplied by the iteration counter.
- * @param {number} [index=0] - An optional offset to start searching from within the items array.
- * @param {number} [direction=1] - The direction to iterate through the array. 1 is from beginning to end, -1 from end to beginning.
- *
- * @return {(array|Phaser.GameObjects.GameObject[])} The array of objects that were passed to this Action.
+ * @return {Phaser.Geom.Point} The given point, rotated by the given angle in an anticlockwise direction.
  */
-var Rotate = function (items, value, step, index, direction)
+var Rotate = function (point, angle)
 {
-    return PropertyValueInc(items, 'rotation', value, step, index, direction);
+    var x = point.x;
+    var y = point.y;
+
+    point.x = (x * Math.cos(angle)) - (y * Math.sin(angle));
+    point.y = (x * Math.sin(angle)) + (y * Math.cos(angle));
+
+    return point;
 };
 
 module.exports = Rotate;

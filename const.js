@@ -4,89 +4,87 @@
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
 
-var INPUT_CONST = {
+var MATH_CONST = {
 
     /**
-     * The mouse pointer is being held down.
+     * The value of PI * 2.
      *
-     * @name Phaser.Input.MOUSE_DOWN
+     * @name Phaser.Math.PI2
      * @type {number}
-     * @since 3.10.0
+     * @since 3.0.0
      */
-    MOUSE_DOWN: 0,
+    PI2: Math.PI * 2,
 
     /**
-     * The mouse pointer is being moved.
+     * The value of PI * 0.5.
      *
-     * @name Phaser.Input.MOUSE_MOVE
+     * Yes, we understand that this should actually be PI * 2, but
+     * it has been like this for so long we can't change it now.
+     * If you need PI * 2, use the PI2 constant instead.
+     *
+     * @name Phaser.Math.TAU
      * @type {number}
-     * @since 3.10.0
+     * @since 3.0.0
      */
-    MOUSE_MOVE: 1,
+    TAU: Math.PI * 0.5,
 
     /**
-     * The mouse pointer is released.
+     * An epsilon value (1.0e-6)
      *
-     * @name Phaser.Input.MOUSE_UP
+     * @name Phaser.Math.EPSILON
      * @type {number}
-     * @since 3.10.0
+     * @since 3.0.0
      */
-    MOUSE_UP: 2,
+    EPSILON: 1.0e-6,
 
     /**
-     * A touch pointer has been started.
+     * For converting degrees to radians (PI / 180)
      *
-     * @name Phaser.Input.TOUCH_START
+     * @name Phaser.Math.DEG_TO_RAD
      * @type {number}
-     * @since 3.10.0
+     * @since 3.0.0
      */
-    TOUCH_START: 3,
+    DEG_TO_RAD: Math.PI / 180,
 
     /**
-     * A touch pointer has been started.
+     * For converting radians to degrees (180 / PI)
      *
-     * @name Phaser.Input.TOUCH_MOVE
+     * @name Phaser.Math.RAD_TO_DEG
      * @type {number}
-     * @since 3.10.0
+     * @since 3.0.0
      */
-    TOUCH_MOVE: 4,
+    RAD_TO_DEG: 180 / Math.PI,
 
     /**
-     * A touch pointer has been started.
+     * An instance of the Random Number Generator.
+     * This is not set until the Game boots.
      *
-     * @name Phaser.Input.TOUCH_END
-     * @type {number}
-     * @since 3.10.0
+     * @name Phaser.Math.RND
+     * @type {Phaser.Math.RandomDataGenerator}
+     * @since 3.0.0
      */
-    TOUCH_END: 5,
+    RND: null,
 
     /**
-     * The pointer lock has changed.
+     * The minimum safe integer this browser supports.
+     * We use a const for backward compatibility with Internet Explorer.
      *
-     * @name Phaser.Input.POINTER_LOCK_CHANGE
+     * @name Phaser.Math.MIN_SAFE_INTEGER
      * @type {number}
-     * @since 3.10.0
+     * @since 3.21.0
      */
-    POINTER_LOCK_CHANGE: 6,
+    MIN_SAFE_INTEGER: Number.MIN_SAFE_INTEGER || -9007199254740991,
 
     /**
-     * A touch pointer has been been cancelled by the browser.
+     * The maximum safe integer this browser supports.
+     * We use a const for backward compatibility with Internet Explorer.
      *
-     * @name Phaser.Input.TOUCH_CANCEL
+     * @name Phaser.Math.MAX_SAFE_INTEGER
      * @type {number}
-     * @since 3.15.0
+     * @since 3.21.0
      */
-    TOUCH_CANCEL: 7,
-
-    /**
-     * The mouse wheel changes.
-     *
-     * @name Phaser.Input.MOUSE_WHEEL
-     * @type {number}
-     * @since 3.18.0
-     */
-    MOUSE_WHEEL: 8
+    MAX_SAFE_INTEGER: Number.MAX_SAFE_INTEGER || 9007199254740991
 
 };
 
-module.exports = INPUT_CONST;
+module.exports = MATH_CONST;

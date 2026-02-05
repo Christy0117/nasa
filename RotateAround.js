@@ -4,37 +4,35 @@
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
 
-var RotateAroundDistance = require('../math/RotateAroundDistance');
-var DistanceBetween = require('../math/distance/DistanceBetween');
-
 /**
- * Rotates each item around the given point by the given angle.
+ * Rotate a `point` around `x` and `y` to the given `angle`, at the same distance.
  *
- * @function Phaser.Actions.RotateAround
+ * In polar notation, this maps a point from (r, t) to (r, angle), vs. the origin (x, y).
+ *
+ * @function Phaser.Math.RotateAround
  * @since 3.0.0
- * @see Phaser.Math.RotateAroundDistance
  *
- * @generic {Phaser.GameObjects.GameObject[]} G - [items,$return]
+ * @generic {Phaser.Types.Math.Vector2Like} T - [point,$return]
  *
- * @param {(array|Phaser.GameObjects.GameObject[])} items - An array of Game Objects. The contents of this array are updated by this Action.
- * @param {object} point - Any object with public `x` and `y` properties.
- * @param {number} angle - The angle to rotate by, in radians.
+ * @param {(Phaser.Geom.Point|object)} point - The point to be rotated.
+ * @param {number} x - The horizontal coordinate to rotate around.
+ * @param {number} y - The vertical coordinate to rotate around.
+ * @param {number} angle - The angle of rotation in radians.
  *
- * @return {(array|Phaser.GameObjects.GameObject[])} The array of Game Objects that was passed to this Action.
+ * @return {Phaser.Types.Math.Vector2Like} The given point.
  */
-var RotateAround = function (items, point, angle)
+var RotateAround = function (point, x, y, angle)
 {
-    var x = point.x;
-    var y = point.y;
+    var c = Math.cos(angle);
+    var s = Math.sin(angle);
 
-    for (var i = 0; i < items.length; i++)
-    {
-        var item = items[i];
+    var tx = point.x - x;
+    var ty = point.y - y;
 
-        RotateAroundDistance(item, x, y, angle, Math.max(1, DistanceBetween(item.x, item.y, x, y)));
-    }
+    point.x = tx * c - ty * s + x;
+    point.y = tx * s + ty * c + y;
 
-    return items;
+    return point;
 };
 
 module.exports = RotateAround;
