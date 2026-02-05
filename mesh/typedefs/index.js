@@ -5,5 +5,5 @@
  */
 
 /**
- * @namespace Phaser.Types.GameObjects.Mesh
+ * @namespace Phaser.Types.Geom.Mesh
  */
