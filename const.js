@@ -4,71 +4,145 @@
  * @license      {@link https://opensource.org/licenses/MIT|MIT License}
  */
 
-var WEBGL_CONST = {
+/**
+ * Global constants.
+ *
+ * @ignore
+ */
+
+var CONST = {
 
     /**
-     * 	8-bit twos complement signed integer.
+     * Phaser Release Version
      *
-     * @name Phaser.Renderer.WebGL.BYTE
-     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
-     * @since 3.50.0
+     * @name Phaser.VERSION
+     * @const
+     * @type {string}
+     * @since 3.0.0
      */
-    BYTE: { enum: 0x1400, size: 1 },
+    VERSION: '3.90.0',
 
     /**
-     * 8-bit twos complement unsigned integer.
+     * Phaser Release Version as displayed in the console.log header URL.
      *
-     * @name Phaser.Renderer.WebGL.UNSIGNED_BYTE
-     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
-     * @since 3.50.0
+     * @name Phaser.LOG_VERSION
+     * @const
+     * @type {string}
+     * @since 3.87.0
      */
-    UNSIGNED_BYTE: { enum: 0x1401, size: 1 },
+    LOG_VERSION: 'v390',
+
+    BlendModes: require('./renderer/BlendModes'),
+
+    ScaleModes: require('./renderer/ScaleModes'),
 
     /**
-     * 16-bit twos complement signed integer.
+     * This setting will auto-detect if the browser is capable of suppporting WebGL.
+     * If it is, it will use the WebGL Renderer. If not, it will fall back to the Canvas Renderer.
      *
-     * @name Phaser.Renderer.WebGL.SHORT
-     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
-     * @since 3.50.0
+     * @name Phaser.AUTO
+     * @const
+     * @type {number}
+     * @since 3.0.0
      */
-    SHORT: { enum: 0x1402, size: 2 },
+    AUTO: 0,
 
     /**
-     * 16-bit twos complement unsigned integer.
+     * Forces Phaser to only use the Canvas Renderer, regardless if the browser supports
+     * WebGL or not.
      *
-     * @name Phaser.Renderer.WebGL.UNSIGNED_SHORT
-     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
-     * @since 3.50.0
+     * @name Phaser.CANVAS
+     * @const
+     * @type {number}
+     * @since 3.0.0
      */
-    UNSIGNED_SHORT: { enum: 0x1403, size: 2 },
+    CANVAS: 1,
 
     /**
-     * 32-bit twos complement signed integer.
+     * Forces Phaser to use the WebGL Renderer. If the browser does not support it, there is
+     * no fallback to Canvas with this setting, so you should trap it and display a suitable
+     * message to the user.
      *
-     * @name Phaser.Renderer.WebGL.INT
-     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
-     * @since 3.50.0
+     * @name Phaser.WEBGL
+     * @const
+     * @type {number}
+     * @since 3.0.0
      */
-    INT: { enum: 0x1404, size: 4 },
+    WEBGL: 2,
 
     /**
-     * 32-bit twos complement unsigned integer.
+     * A Headless Renderer doesn't create either a Canvas or WebGL Renderer. However, it still
+     * absolutely relies on the DOM being present and available. This mode is meant for unit testing,
+     * not for running Phaser on the server, which is something you really shouldn't do.
      *
-     * @name Phaser.Renderer.WebGL.UNSIGNED_INT
-     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
-     * @since 3.50.0
+     * @name Phaser.HEADLESS
+     * @const
+     * @type {number}
+     * @since 3.0.0
      */
-    UNSIGNED_INT: { enum: 0x1405, size: 4 },
+    HEADLESS: 3,
 
     /**
-     * 32-bit IEEE floating point number.
+     * In Phaser the value -1 means 'forever' in lots of cases, this const allows you to use it instead
+     * to help you remember what the value is doing in your code.
      *
-     * @name Phaser.Renderer.WebGL.FLOAT
-     * @type {Phaser.Types.Renderer.WebGL.WebGLConst}
-     * @since 3.50.0
+     * @name Phaser.FOREVER
+     * @const
+     * @type {number}
+     * @since 3.0.0
      */
-    FLOAT: { enum: 0x1406, size: 4 }
+    FOREVER: -1,
+
+    /**
+     * Direction constant.
+     *
+     * @name Phaser.NONE
+     * @const
+     * @type {number}
+     * @since 3.0.0
+     */
+    NONE: 4,
+
+    /**
+     * Direction constant.
+     *
+     * @name Phaser.UP
+     * @const
+     * @type {number}
+     * @since 3.0.0
+     */
+    UP: 5,
+
+    /**
+     * Direction constant.
+     *
+     * @name Phaser.DOWN
+     * @const
+     * @type {number}
+     * @since 3.0.0
+     */
+    DOWN: 6,
+
+    /**
+     * Direction constant.
+     *
+     * @name Phaser.LEFT
+     * @const
+     * @type {number}
+     * @since 3.0.0
+     */
+    LEFT: 7,
+
+    /**
+     * Direction constant.
+     *
+     * @name Phaser.RIGHT
+     * @const
+     * @type {number}
+     * @since 3.0.0
+     */
+    RIGHT: 8
 
 };
 
-module.exports = WEBGL_CONST;
+module.exports = CONST;
